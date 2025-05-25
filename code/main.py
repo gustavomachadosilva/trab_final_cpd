@@ -1,14 +1,19 @@
-from controller.structureBuilder import *
-import time
+# from model.structureBuilder import *
+# import time
 
-moviesFilePath = "../dados-trabalho-completo/movies.csv"
-ratingsFilePath = "../dados-trabalho-completo/ratings.csv"
-tagsFilePath = "../dados-trabalho-completo/tags.csv"
+# moviesFilePath = "../dados-trabalho-completo/movies.csv"
+# ratingsFilePath = "../dados-trabalho-completo/ratings.csv"
+# tagsFilePath = "../dados-trabalho-completo/tags.csv"
 
-structureBuilder = StructureBuilder(moviesFilePath, ratingsFilePath, tagsFilePath)
+# structureBuilder = StructureBuilder(moviesFilePath, ratingsFilePath, tagsFilePath)
 
-begin = time.time()
-structureBuilder.buildAll()
-end = time.time()
+# begin = time.time()
+# structureBuilder.buildAll()
+# end = time.time()
 
-print(f"Execution time: {end - begin:.4f} seconds")
+# print(f"Execution time: {end - begin:.4f} seconds")
+
+from view.app import *
+
+app = App()
+app.mainloop()

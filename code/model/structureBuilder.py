@@ -1,9 +1,9 @@
 import pandas as pd
 import time
-from model.structures.separateChainingHash import *
-from model.basic.movie import *
-from model.basic.user import *
-from model.basic.rating import *
+from .structures.separateChainingHash import *
+from .basic.movie import *
+from .basic.user import *
+from .basic.rating import *
 
 class StructureBuilder:
 
