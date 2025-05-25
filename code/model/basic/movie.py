@@ -15,3 +15,6 @@ class Movie:
 
     def getGlobalRating(self) -> float:
         return self.sumRatings / float(self.ratingsCounter)
+    
+    def __str__(self):
+        return f"{self.id}, {self.title}, {self.genres}, {self.year}, {self.getGlobalRating():.6f}"
