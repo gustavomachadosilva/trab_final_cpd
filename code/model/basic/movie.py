@@ -14,7 +14,10 @@ class Movie:
         self.sumRatings += rating
 
     def getGlobalRating(self) -> float:
-        return self.sumRatings / float(self.ratingsCounter)
+        if (self.ratingsCounter != float(0)):
+            return self.sumRatings / float(self.ratingsCounter)
+        else:
+            return float(0)
     
     def __str__(self):
         return f"{self.id}, {self.title}, {self.genres}, {self.year}, {self.getGlobalRating():.6f}"

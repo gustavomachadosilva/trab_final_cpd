@@ -1,16 +1,21 @@
 import pandas as pd
 import time
-from .structures.separateChainingHash import *
-from .basic.movie import *
-from .basic.user import *
-from .basic.rating import *
+from model.structures.separateChainingHash import *
+from model.basic.movie import *
+from model.basic.user import *
+from model.basic.rating import *
 
 class StructureBuilder:
+
+    
 
     def __init__(self, moviesFilePath, ratingsFilePath, tagsFilePath):
         self.moviesFilePath = moviesFilePath
         self.ratingsFilePath = ratingsFilePath
         self.tagsFilePath = tagsFilePath
+
+        self.hashMovie: SeparateChainingHash
+        self.hashUser: SeparateChainingHash
 
     def buildAll(self):
         self.buildMoviesStructure()
@@ -24,27 +29,24 @@ class StructureBuilder:
 
     def buildMoviesStructure(self):
         df = pd.read_csv(self.moviesFilePath)
-        hash = SeparateChainingHash(len(df))
+        self.hashMovie = SeparateChainingHash(len(df))
 
         for row in df.itertuples():
             movie = Movie(row.movieId, row.title, row.genres, row.year)
-            hash.insertValue(movie)
+            self.hashMovie.insertValue(movie)
     
 
     def buildUsersStructure(self):
         df = pd.read_csv(self.ratingsFilePath)
-        hash = SeparateChainingHash(140000)
+        self.hashUser = SeparateChainingHash(140000)
         user: User = None
 
         for row in df.itertuples():
-            movie: Movie = hash.findById(row.movieId)
+            movie: Movie = self.hashMovie.findById(row.movieId)
 
             if (user == None or user.id != row.userId):
-                user = hash.findById(row.userId)
-
-            if (user == None):
                 user = User(row.userId)
-                hash.insertValue(user)
+                self.hashUser.insertValue(user)           
 
             rating = Rating(row.movieId, row.rating, row.date)
             user.addRating(rating)
