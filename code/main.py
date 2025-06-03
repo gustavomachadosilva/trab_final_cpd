@@ -13,6 +13,7 @@ tagsFilePath = "dados-trabalho-completo/tags.csv"
 structureBuilder = StructureBuilder(moviesFilePath, ratingsFilePath, tagsFilePath)
 
 from view.app import *
+from controller.structureBuilder import *
 
 app = App(structureBuilder=structureBuilder)
 app.mainloop()
