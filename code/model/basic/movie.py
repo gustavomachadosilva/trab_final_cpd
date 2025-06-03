@@ -1,7 +1,7 @@
 class Movie:
 
-    sumRatings = 0.0
-    ratingsCounter = 0
+    sumRatings: float = 0.0
+    ratingsCounter: int = 0
 
     def __init__(self, id: int, title: str, genres: str, year: int) -> None:
         self.id = id
@@ -15,10 +15,10 @@ class Movie:
         self.sumRatings += rating
 
     def getGlobalRating(self) -> float:
-        if float(self.ratingsCounter) != 0:
+        if (self.ratingsCounter != float(0)):
             return self.sumRatings / float(self.ratingsCounter)
-        else: 
-            return 0
+        else:
+            return float(0)
     
     def __str__(self):
         return f"{self.id}, {self.title}, {self.genres}, {self.year}, {self.getGlobalRating():.6f}"

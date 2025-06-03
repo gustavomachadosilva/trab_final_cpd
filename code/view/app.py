@@ -1,10 +1,14 @@
 import customtkinter
 from tkinter import ttk
+from controller.structureBuilder import *
+from model.basic.movie import *
 
 class App(customtkinter.CTk):
     
-    def __init__(self, fg_color = None, **kwargs):
+    def __init__(self, structureBuilder,fg_color = None, **kwargs):
         super().__init__(fg_color, **kwargs)
+
+        self.structureBuilder: StructureBuilder = structureBuilder
 
         customtkinter.set_appearance_mode("dark")
 
@@ -21,21 +25,27 @@ class App(customtkinter.CTk):
         self.frame2 = customtkinter.CTkFrame(self)
         self.frame2.grid(row=0, column=1, padx=(0,10), pady=(10,10),sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_callbck)
+        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_action)
         self.button.pack(padx=20, pady=20)
 
         self.style = ttk.Style()
         self.configure_treeview_style()
 
-        self.tree = ttk.Treeview(self.frame2, columns=("col1", "col2"), show="headings", style="Custom.Treeview", selectmode="browse")
-        self.tree.heading("col1", text="Column 1")
-        self.tree.heading("col2", text="Column 2")
-        self.tree.pack(padx=10, pady=10, fill="both", expand=True)
+        self.tree = ttk.Treeview(self.frame2, columns=("col1", "col2", "col3", "col4", "col5", "col6"), show="headings", style="Custom.Treeview", selectmode="browse")
+        self.tree.heading("col1", text="movieId")
+        self.tree.heading("col2", text="title")
+        self.tree.heading("col3", text="genres")
+        self.tree.heading("col4", text="year")
+        self.tree.heading("col5", text="rating")
+        self.tree.heading("col6", text="count")
 
-        # Inserir linhas com tags alternadas
-        for i in range(100):
-            tag = "evenrow" if i % 2 == 0 else "oddrow"
-            self.tree.insert("", "end", values=(f"Dado {i}", f"Dado {i+1}"), tags=(tag,))
+        self.tree.column("col1", width=30, anchor="center")    # movieId
+        self.tree.column("col2", width=340, anchor="w")        # title
+        self.tree.column("col3", width=290, anchor="w")        # genres
+        self.tree.column("col4", width=30, anchor="center")    # year
+        self.tree.column("col5", width=60, anchor="center")   # rating
+        self.tree.column("col6", width=30, anchor="center")    # count
+        self.tree.pack(padx=10, pady=10, fill="both", expand=True)
 
         
 
@@ -46,6 +56,24 @@ class App(customtkinter.CTk):
 
     def button_callbck(self):
         print("button clicked")
+        for i in range(100):
+            tag = "evenrow" if i % 2 == 0 else "oddrow"
+            self.tree.insert("", "end", values=(f"Dado {i}", f"Dado {i+1}"), tags=(tag,))
+    
+    def button_action(self):
+        
+        x = 0
+
+        for i in self.structureBuilder.hashMovie.linkedLists:
+            current = i.head
+
+            while (current != None):
+                movie: Movie = current.value
+                rating = movie.getGlobalRating()
+                tag = "evenrow" if x % 2 == 0 else "oddrow"
+                x += 1
+                self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, f"{rating:.6f}", movie.ratingsCounter), tags=(tag,))
+                current = current.next
     
     def configure_treeview_style(self):
         mode = customtkinter.get_appearance_mode()

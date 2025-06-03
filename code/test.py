@@ -1,5 +1,5 @@
-from view.app import *
 from controller.structureBuilder import *
+import time
 
 # moviesFilePath = "../dados-trabalho-completo/movies.csv"
 # ratingsFilePath = "../dados-trabalho-completo/ratings.csv"
@@ -12,7 +12,8 @@ tagsFilePath = "dados-trabalho-completo/tags.csv"
 
 structureBuilder = StructureBuilder(moviesFilePath, ratingsFilePath, tagsFilePath)
 
-from view.app import *
+begin = time.time()
+structureBuilder.buildAll()
+end = time.time()
 
-app = App(structureBuilder=structureBuilder)
-app.mainloop()
+print(f"Execution time: {end - begin:.4f} seconds")
