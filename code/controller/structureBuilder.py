@@ -24,8 +24,8 @@ class StructureBuilder:
         self.buildUsersStructure()
         end = time.time()
 
-        for id in self.trieMovies.search_prefix("America"):
-            print(self.hashMovie.findById(id))
+        # for id in self.trieMovies.search_prefix("America"):
+        #     print(self.hashMovie.findById(id))
 
         print(f"user builder execution time: {end - begin:.4f} seconds")
 

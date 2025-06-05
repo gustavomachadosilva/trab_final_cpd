@@ -25,7 +25,7 @@ class App(customtkinter.CTk):
         self.frame2 = customtkinter.CTkFrame(self)
         self.frame2.grid(row=0, column=1, padx=(0,10), pady=(10,10),sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_action)
+        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_firstResearch)
         self.button.pack(padx=20, pady=20)
 
         self.style = ttk.Style()
@@ -74,6 +74,18 @@ class App(customtkinter.CTk):
                 x += 1
                 self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, f"{rating:.6f}", movie.ratingsCounter), tags=(tag,))
                 current = current.next
+    
+    def button_firstResearch(self):
+
+        x = 0
+
+        for id in self.structureBuilder.trieMovies.search_prefix("America"):
+            movie: Movie = self.structureBuilder.hashMovie.findById(id)
+            rating = movie.getGlobalRating()
+            tag = "evenrow" if x % 2 == 0 else "oddrow"
+            x += 1
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, f"{rating:.6f}", movie.ratingsCounter), tags=(tag,))
+                
     
     def configure_treeview_style(self):
         mode = customtkinter.get_appearance_mode()
