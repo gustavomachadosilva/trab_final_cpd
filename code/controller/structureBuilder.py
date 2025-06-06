@@ -16,6 +16,7 @@ class StructureBuilder:
         self.ratingsFilePath = ratingsFilePath
         self.tagsFilePath = tagsFilePath
 
+        self.trieTags = None
         self.trieMovies = None
         self.hashMovie: SeparateChainingHash
         self.hashUser: SeparateChainingHash
@@ -26,6 +27,8 @@ class StructureBuilder:
         begin = time.time()
         self.buildUsersStructure()
         end = time.time()
+
+        self.buildTagsStructure()
 
         print(f"user builder execution time: {end - begin:.4f} seconds")
 
@@ -59,3 +62,9 @@ class StructureBuilder:
             if (movie != None):
                 movie.addRating(float(row.rating))
 
+    def buildTagsStructure(self):
+        df = pd.read_csv(self.tagsFilePath)
+        self.trieTags = Trie()
+        
+        for row in df.itertuples():
+            self.trieTags.insert(row.tag, row.movieId)

@@ -25,7 +25,7 @@ class App(customtkinter.CTk):
         self.frame2 = customtkinter.CTkFrame(self)
         self.frame2.grid(row=0, column=1, padx=(0,10), pady=(10,10),sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_firstResearch)
+        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_fourthResearch)
         self.button.pack(padx=20, pady=20)
 
         self.style = ttk.Style()
@@ -90,7 +90,35 @@ class App(customtkinter.CTk):
             x += 1
             self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter), tags=(tag,))
                 
-    
+
+    ## pesquisa 4 quase pronta, o único problema é que a trie está pesquisando por prefixo,
+    ## a pesquisa deve ser pela string inteira.
+    def button_fourthResearch(self):
+        x = 0
+        moviesList = []
+
+        stringTagSearch = "'feel good' 'predictable'"
+        parts = stringTagSearch.split("'")
+        tagTerms = [part for i, part in enumerate(parts) if i % 2 == 1]
+
+        idsList = self.structureBuilder.trieTags.search_prefix(tagTerms.pop())
+        for term in tagTerms:
+            idsList = list(set(idsList) & set(self.structureBuilder.trieTags.search_prefix(term)))
+
+
+        for id in idsList:
+            movie: Movie = self.structureBuilder.hashMovie.findById(id)
+            if movie:
+                moviesList.append(movie)
+
+        selection_sort_movies_by_rating(moviesList)
+
+        for movie in moviesList:
+            tag = "evenrow" if x % 2 == 0 else "oddrow"
+            x += 1
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter), tags=(tag,))
+
+
     def configure_treeview_style(self):
         mode = customtkinter.get_appearance_mode()
 
