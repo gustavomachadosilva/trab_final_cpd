@@ -6,6 +6,9 @@ from model.basic.movie import *
 from model.basic.user import *
 from model.basic.rating import *
 
+from model.basic.movie_utils import *
+
+
 class StructureBuilder:
 
     def __init__(self, moviesFilePath, ratingsFilePath, tagsFilePath):
@@ -23,9 +26,6 @@ class StructureBuilder:
         begin = time.time()
         self.buildUsersStructure()
         end = time.time()
-
-        # for id in self.trieMovies.search_prefix("America"):
-        #     print(self.hashMovie.findById(id))
 
         print(f"user builder execution time: {end - begin:.4f} seconds")
 

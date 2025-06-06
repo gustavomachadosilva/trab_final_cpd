@@ -76,15 +76,19 @@ class App(customtkinter.CTk):
                 current = current.next
     
     def button_firstResearch(self):
-
         x = 0
-
+        moviesList = []
         for id in self.structureBuilder.trieMovies.search_prefix("America"):
             movie: Movie = self.structureBuilder.hashMovie.findById(id)
-            rating = movie.getGlobalRating()
+            if movie:
+                moviesList.append(movie)
+
+        selection_sort_movies_by_rating(moviesList)
+
+        for movie in moviesList:
             tag = "evenrow" if x % 2 == 0 else "oddrow"
             x += 1
-            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, f"{rating:.6f}", movie.ratingsCounter), tags=(tag,))
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter), tags=(tag,))
                 
     
     def configure_treeview_style(self):
