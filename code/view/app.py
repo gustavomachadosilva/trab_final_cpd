@@ -101,9 +101,9 @@ class App(customtkinter.CTk):
         parts = stringTagSearch.split("'")
         tagTerms = [part for i, part in enumerate(parts) if i % 2 == 1]
 
-        idsList = self.structureBuilder.trieTags.search_prefix(tagTerms.pop())
+        idsList = self.structureBuilder.trieTags.search_string(tagTerms.pop())
         for term in tagTerms:
-            idsList = list(set(idsList) & set(self.structureBuilder.trieTags.search_prefix(term)))
+            idsList = list(set(idsList) & set(self.structureBuilder.trieTags.search_string(term)))
 
 
         for id in idsList:

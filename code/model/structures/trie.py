@@ -31,3 +31,12 @@ class Trie:
         for child in node.children.values():
             result.extend(self._find_movies_with_prefix(child))
         return result
+
+    def search_string(self, text):
+        node = self.root
+        for char in text:
+            norm_char = self._normalize_char(char)
+            if norm_char not in node.children:
+                return []
+            node = node.children[norm_char]
+        return node.movie_ids
