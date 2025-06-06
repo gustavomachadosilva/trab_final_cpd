@@ -2,6 +2,9 @@ import customtkinter
 from tkinter import ttk
 from controller.structureBuilder import *
 from model.basic.movie import *
+from model.basic.user import *
+from model.basic.rating import *
+
 
 class App(customtkinter.CTk):
     
@@ -25,19 +28,20 @@ class App(customtkinter.CTk):
         self.frame2 = customtkinter.CTkFrame(self)
         self.frame2.grid(row=0, column=1, padx=(0,10), pady=(10,10),sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_fourthResearch)
+        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_firstResearch)
         self.button.pack(padx=20, pady=20)
 
         self.style = ttk.Style()
         self.configure_treeview_style()
 
-        self.tree = ttk.Treeview(self.frame2, columns=("col1", "col2", "col3", "col4", "col5", "col6"), show="headings", style="Custom.Treeview", selectmode="browse")
+        self.tree = ttk.Treeview(self.frame2, columns=("col1", "col2", "col3", "col4", "col5", "col6", "col7"), show="headings", style="Custom.Treeview", selectmode="browse")
         self.tree.heading("col1", text="movieId")
         self.tree.heading("col2", text="title")
         self.tree.heading("col3", text="genres")
         self.tree.heading("col4", text="year")
-        self.tree.heading("col5", text="rating")
+        self.tree.heading("col5", text="global_rating")
         self.tree.heading("col6", text="count")
+        self.tree.heading("col7", text="rating")
 
         self.tree.column("col1", width=30, anchor="center")    # movieId
         self.tree.column("col2", width=340, anchor="w")        # title
@@ -45,6 +49,7 @@ class App(customtkinter.CTk):
         self.tree.column("col4", width=30, anchor="center")    # year
         self.tree.column("col5", width=60, anchor="center")   # rating
         self.tree.column("col6", width=30, anchor="center")    # count
+        self.tree.column("col7", width=30, anchor="center")    # count
         self.tree.pack(padx=10, pady=10, fill="both", expand=True)
 
         
@@ -83,16 +88,35 @@ class App(customtkinter.CTk):
             if movie:
                 moviesList.append(movie)
 
-        selection_sort_movies_by_rating(moviesList)
+        selection_sort_movies_by_global_rating(moviesList)
 
         for movie in moviesList:
             tag = "evenrow" if x % 2 == 0 else "oddrow"
             x += 1
-            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter), tags=(tag,))
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, '-'), tags=(tag,))
                 
+    def button_secondResearch(self):
+        x = 0
+        moviesList = []
 
-    ## pesquisa 4 quase pronta, o único problema é que a trie está pesquisando por prefixo,
-    ## a pesquisa deve ser pela string inteira.
+        user: User = self.structureBuilder.hashUser.findById(54766)
+        if user is None:
+            print("Usuário não encontrado!")
+            return
+
+        for rating in user.ratings:
+            movie: Movie = self.structureBuilder.hashMovie.findById(rating.movieId)
+            if movie:
+                moviesList.append((movie, rating.value))
+
+        selection_sort_by_rating_then_global(moviesList)     
+        moviesList = moviesList[:20]
+
+        for movie, userRating in moviesList:
+            tag = "evenrow" if x % 2 == 0 else "oddrow"
+            x += 1
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, userRating), tags=(tag,))
+
     def button_fourthResearch(self):
         x = 0
         moviesList = []
@@ -111,12 +135,12 @@ class App(customtkinter.CTk):
             if movie:
                 moviesList.append(movie)
 
-        selection_sort_movies_by_rating(moviesList)
+        selection_sort_movies_by_global_rating(moviesList)
 
         for movie in moviesList:
             tag = "evenrow" if x % 2 == 0 else "oddrow"
             x += 1
-            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter), tags=(tag,))
+            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, '-'), tags=(tag,))
 
 
     def configure_treeview_style(self):
