@@ -75,11 +75,7 @@ class Search:
     def searchByTags(self, listOfTags) -> list[Movie]:
         moviesList: list[Movie] = []
 
-        parts = listOfTags.split(",")
-
-        for i in range(len(parts)):
-            parts[i] = parts[i].replace("'", "")
-            parts[i].strip()
+        parts = self.formatTags(listOfTags)
 
         for tag in parts:
             for id in self.structureBuilder.trieTags.search_string(tag):
@@ -92,3 +88,13 @@ class Search:
         selection_sort_movies_by_global_rating(moviesList)
 
         return moviesList
+
+    def formatTags(listOfTags):
+
+        parts = listOfTags.split(",")
+
+        for i in range(len(parts)):
+            parts[i] = parts[i].replace("'", "")
+            parts[i].strip()
+        
+        return parts

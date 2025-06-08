@@ -23,14 +23,8 @@ class StructureBuilder:
 
     def buildAll(self):
         self.buildMoviesStructure()
-
-        # begin = time.time()
         self.buildUsersStructure()
-        # end = time.time()
-
         self.buildTagsStructure()
-
-        # print(f"user builder execution time: {end - begin:.4f} seconds")
 
 
     def buildMoviesStructure(self):
