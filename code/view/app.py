@@ -1,6 +1,7 @@
 import customtkinter
 from tkinter import ttk
 from controller.structureBuilder import *
+from controller.search import *
 from model.basic.movie import *
 from model.basic.user import *
 from model.basic.rating import *
@@ -12,10 +13,11 @@ class App(customtkinter.CTk):
         super().__init__(fg_color, **kwargs)
 
         self.structureBuilder: StructureBuilder = structureBuilder
+        self.search = Search(structureBuilder)
 
         customtkinter.set_appearance_mode("dark")
 
-        self.title("my app")
+        self.title("Movies")
         self.geometry("1400x800")
         self._set_appearance_mode("dark")
         self.grid_columnconfigure(0, weight=1)
@@ -28,8 +30,27 @@ class App(customtkinter.CTk):
         self.frame2 = customtkinter.CTkFrame(self)
         self.frame2.grid(row=0, column=1, padx=(0,10), pady=(10,10),sticky="nsew")
 
-        self.button = customtkinter.CTkButton(self.frame, text="my button", command=self.button_firstResearch)
-        self.button.pack(padx=20, pady=20)
+        self.entrySerachByPrefix = customtkinter.CTkEntry(self.frame, placeholder_text="Prefix")
+        self.entrySerachByPrefix.pack(padx=10, pady=(20,5))
+        self.buttonSerachByPrefix = customtkinter.CTkButton(self.frame, text="Search by prefix", command=self.buttonSearchByPrefixAction)
+        self.buttonSerachByPrefix.pack(padx=10, pady=0)
+
+        self.entrySerachByUserId = customtkinter.CTkEntry(self.frame, placeholder_text="User Id")
+        self.entrySerachByUserId.pack(padx=10, pady=(40,5))
+        self.buttonSerachByUserId = customtkinter.CTkButton(self.frame, text="Search by user id", command=self.buttonSearchByUserIdAction)
+        self.buttonSerachByUserId.pack(padx=10, pady=0)
+
+        self.entrySerachByGenreN = customtkinter.CTkEntry(self.frame, placeholder_text="Max")
+        self.entrySerachByGenreN.pack(padx=10, pady=(40,5))
+        self.entrySerachByGenre = customtkinter.CTkEntry(self.frame, placeholder_text="Genre")
+        self.entrySerachByGenre.pack(padx=10, pady=(0,5))
+        self.buttonSerachByGenre = customtkinter.CTkButton(self.frame, text="Search by genre", command=self.buttonSearchByGenreAction)
+        self.buttonSerachByGenre.pack(padx=10, pady=0)
+
+        self.entrySerachByTags = customtkinter.CTkEntry(self.frame, placeholder_text="'tag1','tag2'...")
+        self.entrySerachByTags.pack(padx=10, pady=(40,5))
+        self.buttonSerachByTags = customtkinter.CTkButton(self.frame, text="Search by tags", command=self.buttonSearchByTagsAction)
+        self.buttonSerachByTags.pack(padx=10, pady=0)
 
         self.style = ttk.Style()
         self.configure_treeview_style()
@@ -57,90 +78,55 @@ class App(customtkinter.CTk):
         # Aplicar estilos às tags
         self.tree.tag_configure("evenrow", background=self.row_color_even, foreground=self.fg_color)
         self.tree.tag_configure("oddrow", background=self.row_color_odd, foreground=self.fg_color)
-        
-
-    def button_callbck(self):
-        print("button clicked")
-        for i in range(100):
-            tag = "evenrow" if i % 2 == 0 else "oddrow"
-            self.tree.insert("", "end", values=(f"Dado {i}", f"Dado {i+1}"), tags=(tag,))
     
-    def button_action(self):
+    
+    def buttonSearchByPrefixAction(self):
+        prefix = self.entrySerachByPrefix.get()
+        moviesList = self.search.searchMoviesByPrefix(prefix)
+        self.insertInTable(moviesList)
+
+    def buttonSearchByUserIdAction(self):
+        userId = int(self.entrySerachByUserId.get())
+        moviesList = self.search.searchByUserId(userId)
+        self.insertInTableRatingVersion(moviesList)
+
+    def buttonSearchByGenreAction(self):
+        max = int(self.entrySerachByGenreN.get())
+        genre = self.entrySerachByGenre.get()
+        moviesList = self.search.searchByGenre(max, genre)
+        self.insertInTable(moviesList)
+
+    def buttonSearchByTagsAction(self):
+        listOfTags = self.entrySerachByTags.get()
+        moviesList = self.search.searchByTags(listOfTags)
+        self.insertInTable(moviesList)
+
+
+    def insertInTable(self, moviesList):
         
         x = 0
 
-        for i in self.structureBuilder.hashMovie.linkedLists:
-            current = i.head
-
-            while (current != None):
-                movie: Movie = current.value
-                rating = movie.getGlobalRating()
-                tag = "evenrow" if x % 2 == 0 else "oddrow"
-                x += 1
-                self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, f"{rating:.6f}", movie.ratingsCounter), tags=(tag,))
-                current = current.next
-    
-    def button_firstResearch(self):
-        x = 0
-        moviesList = []
-        for id in self.structureBuilder.trieMovies.search_prefix("America"):
-            movie: Movie = self.structureBuilder.hashMovie.findById(id)
-            if movie:
-                moviesList.append(movie)
-
-        selection_sort_movies_by_global_rating(moviesList)
+        self.deleteTableData()
 
         for movie in moviesList:
             tag = "evenrow" if x % 2 == 0 else "oddrow"
             x += 1
             self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, '-'), tags=(tag,))
-                
-    def button_secondResearch(self):
+    
+    def insertInTableRatingVersion(self, moviesList):
+
         x = 0
-        moviesList = []
 
-        user: User = self.structureBuilder.hashUser.findById(54766)
-        if user is None:
-            print("Usuário não encontrado!")
-            return
-
-        for rating in user.ratings:
-            movie: Movie = self.structureBuilder.hashMovie.findById(rating.movieId)
-            if movie:
-                moviesList.append((movie, rating.value))
-
-        selection_sort_by_rating_then_global(moviesList)     
-        moviesList = moviesList[:20]
+        self.deleteTableData()
 
         for movie, userRating in moviesList:
             tag = "evenrow" if x % 2 == 0 else "oddrow"
             x += 1
             self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, userRating), tags=(tag,))
 
-    def button_fourthResearch(self):
-        x = 0
-        moviesList = []
-
-        stringTagSearch = "'feel good' 'predictable'"
-        parts = stringTagSearch.split("'")
-        tagTerms = [part for i, part in enumerate(parts) if i % 2 == 1]
-
-        idsList = self.structureBuilder.trieTags.search_string(tagTerms.pop())
-        for term in tagTerms:
-            idsList = list(set(idsList) & set(self.structureBuilder.trieTags.search_string(term)))
-
-
-        for id in idsList:
-            movie: Movie = self.structureBuilder.hashMovie.findById(id)
-            if movie:
-                moviesList.append(movie)
-
-        selection_sort_movies_by_global_rating(moviesList)
-
-        for movie in moviesList:
-            tag = "evenrow" if x % 2 == 0 else "oddrow"
-            x += 1
-            self.tree.insert("", "end", values=(movie.id, movie.title, movie.genres, movie.year, format(movie.getGlobalRating(), ".6f"), movie.ratingsCounter, '-'), tags=(tag,))
+    def deleteTableData(self):
+        for item in self.tree.get_children():
+            self.tree.delete(item)
 
 
     def configure_treeview_style(self):
